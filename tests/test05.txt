@@ -1,0 +1,5 @@
+#
+# test05.txt - Entrées et sorties
+#
+ls -la > ls.txt
+cat < ls.txt
