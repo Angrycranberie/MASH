@@ -22,13 +22,16 @@
 
 int main()
 {
+
+	int nbalive = 0;
+
 	while (1) {
 		struct cmdline *l;
 		int i, j;
 		
+		//for pipe
 		int fd_in[2];
 		int fd_out[2] = {-1,-1};
-
 		
 		printf("%smash>%s ", C_MSH, C_RST);
 		l = readcmd();
@@ -68,16 +71,17 @@ int main()
 			}
 
 			/* One processus is created per command ; checks if the shell must be quitted before */
-			if (pid != 0) {
-				/* Quits the shell */
-				if (!strcmp(cmd[0],"quit")) exit(EXIT_SUCCESS);
-				pid = Fork();
-			}
+			
+			/* Quits the shell */
+			if (!strcmp(cmd[0],"quit")) exit(EXIT_SUCCESS);		
+
+			nbalive++;
 
 			/* Execute the command if current processus is a child */
-			if (pid == 0) {
+			if(pid = Fork() == 0) {
 
-
+				//pipe and file desc management
+				//if there is one commande
 				if(i==0 && l->seq[i+1] == 0){
 					if (l->in) {
 		 				int f_in = Open(l->in, O_RDONLY, 0);
@@ -91,6 +95,7 @@ int main()
 
 				}else{
 					
+					//if it's the first command
 					if (i==0){
 						if (l->in) {
 		 					int f_in = Open(l->in, O_RDONLY, 0);
@@ -100,7 +105,7 @@ int main()
 		 				Close(fd_out[0]);
 		 				Dup2(fd_out[1],1);
 
-					
+					//if it's the last command
 					} else if (l->seq[i+1]==0){
 						if (l->out) {
 		 					int f_out = Open(l->out, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR|S_IXUSR);
@@ -124,19 +129,30 @@ int main()
 				}
 
 				execvp(cmd[0], cmd);
-				//Termine le processus si aucune commande n'a pu être exécutée.
+				//End process if no command can be execute.
 				exit(0);
 			}
 			if(fd_in[0] != -1){
 				Close(fd_in[0]);
-			}
-			if (fd_in[1] != -1){
 				Close(fd_in[1]);
 			}
 		}
-		for (i=0; l->seq[i]!=0; i++) {
-			Wait(NULL);
+
+		//Check if background or not
+		if(l->bg != 1){
+			while(waitpid(-1, NULL, WNOHANG) <= 0){
+				nbalive--;
+			}
 		}
+		//wait last process
+		int k;
+		for(k = 0; k< nbalive; k++){
+			waitpid(-1, NULL, WNOHANG);
+		}
+		//closing pipe
+		Close(fd_out[0]);
+		Close(fd_out[1]);
+
 	}
 }
 
