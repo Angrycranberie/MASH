@@ -237,6 +237,7 @@ struct cmdline *readcmd(void)
 			cmd[0] = 0;
 			cmd_len = 0;
 			break;
+		// the word "&" can only be at the end 
 		case '&':
 			if(words[i] != 0){
 				s -> err = "command after &";
