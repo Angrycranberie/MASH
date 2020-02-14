@@ -131,18 +131,11 @@ int main()
 			}
 			if(fd_in[0] != -1){
 				Close(fd_in[0]);
-			}
-			if (fd_in[1] != -1){
 				Close(fd_in[1]);
 			}
 		}
 
-		if(bg == 1){
-			for (i=0; l->seq[i]!=0; i++) {
-				Waitpid(-1, NULL, WNOHANG|WUNTRACED);
-				printf("ui\n");
-			}
-		}else{
+		if(bg != 1){
 			for (i=0; l->seq[i]!=0; i++) {
 				Wait(NULL);	
 			}

@@ -95,6 +95,10 @@ static char **split_in_words(char *line)
 			w = "|";
 			cur++;
 			break;
+		case '&':
+			w = "&";
+			cur++;
+			break;
 		default:
 			/* Another word */
 			start = cur;
@@ -233,6 +237,13 @@ struct cmdline *readcmd(void)
 			cmd[0] = 0;
 			cmd_len = 0;
 			break;
+		case '&':
+			if(words[i] != 0){
+				s -> err = "command after &";
+				goto error;
+			}
+			s->bg = 1;
+			break;
 		default:
 			cmd = xrealloc(cmd, (cmd_len + 2) * sizeof(char *));
 			cmd[cmd_len++] = w;
@@ -259,7 +270,6 @@ error:
 		case '<':
 		case '>':
 		case '|':
-		case '&':
 			break;
 		default:
 			free(w);
