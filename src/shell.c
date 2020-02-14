@@ -29,6 +29,7 @@ int main()
 		int fd_in[2];
 		int fd_out[2] = {-1,-1};
 
+		int bg = 0;
 		
 		printf("%smash>%s ", C_MSH, C_RST);
 		l = readcmd();
@@ -71,6 +72,7 @@ int main()
 			if (pid != 0) {
 				/* Quits the shell */
 				if (!strcmp(cmd[0],"quit")) exit(EXIT_SUCCESS);
+
 				pid = Fork();
 			}
 
@@ -134,8 +136,16 @@ int main()
 				Close(fd_in[1]);
 			}
 		}
-		for (i=0; l->seq[i]!=0; i++) {
-			Wait(NULL);
+
+		if(bg == 1){
+			for (i=0; l->seq[i]!=0; i++) {
+				Waitpid(-1, NULL, WNOHANG|WUNTRACED);
+				printf("ui\n");
+			}
+		}else{
+			for (i=0; l->seq[i]!=0; i++) {
+				Wait(NULL);	
+			}
 		}
 	}
 }
