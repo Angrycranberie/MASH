@@ -1,0 +1,4 @@
+#
+# test10.txt - Tubes + redirections + arrière-plan
+#
+ls tests | grep test1 | wc -l > count.txt &

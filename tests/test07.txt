@@ -1,0 +1,4 @@
+#
+# test07.txt - Deux tubes
+#
+ls tests | grep test0 | wc -l

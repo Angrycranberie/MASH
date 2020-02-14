@@ -1,0 +1,4 @@
+#
+# test09.txt - Un tube
+#
+cat < ls.txt | grep *.txt > res.txt

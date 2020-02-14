@@ -1,0 +1,4 @@
+#
+# test08.txt - Arrière-plan
+#
+ps &
