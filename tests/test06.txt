@@ -1,0 +1,4 @@
+#
+# test06.txt - Un tube
+#
+ls tests | grep test0
