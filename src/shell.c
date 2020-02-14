@@ -135,19 +135,20 @@ int main()
 			}
 		}
 
+		//Check if background or not
 		if(l->bg != 1){
-			while(waitpid(-1, NULL, WNOHANG|WUNTRACED) <= 0){
+			while(waitpid(-1, NULL, WNOHANG) <= 0){
 				nbalive--;
 			}
 		}
-
+		//wait last process
 		if(nbalive > 0 ){
-			while((waitpid(-1, NULL, WNOHANG))>0){
+			while((waitpid(-1, NULL, WNOHANG|WUNTRACED)){
 				nbalive--;
 			}
 
 		}
-	
+		//closing pipe
 		Close(fd_out[0]);
 		Close(fd_out[1]);
 
