@@ -45,7 +45,7 @@ static char *readline(void)
 		free(buf);
 		return NULL;
 	}
-
+	
 	if (feof(stdin)) { /* End of file (ctrl-d) */
 	    fflush(stdout);
 	    exit(0);
@@ -78,40 +78,44 @@ static char **split_in_words(char *line)
 		char *w = 0;
 		char *start;
 		switch (c) {
-		case ' ':
-		case '\t':
-			/* Ignore any whitespace */
-			cur++;
-			break;
-		case '<':
-			w = "<";
-			cur++;
-			break;
-		case '>':
-			w = ">";
-			cur++;
-			break;
-		case '|':
-			w = "|";
-			cur++;
-			break;
-		default:
-			/* Another word */
-			start = cur;
-			while (c) {
-				c = *++cur;
-				switch (c) {
-				case 0:
-				case ' ':
-				case '\t':
-				case '<':
-				case '>':
-				case '|':
-					c = 0;
-					break;
-				default: ;
+			case ' ':
+			case '\t':
+				/* Ignore any whitespace */
+				cur++;
+				break;
+			case '<':
+				w = "<";
+				cur++;
+				break;
+			case '>':
+				w = ">";
+				cur++;
+				break;
+			case '|':
+				w = "|";
+				cur++;
+				break;
+			case '&':
+				w = "&";
+				cur++;
+				break;
+			default:
+				/* Another word */
+				start = cur;
+				while (c) {
+					c = *++cur;
+					switch (c) {
+						case 0:
+						case ' ':
+						case '\t':
+						case '<':
+						case '>':
+						case '|':
+							c = 0;
+							break;
+						default: ;
+					}
 				}
-			}
 			w = xmalloc((cur - start + 1) * sizeof(char));
 			strncpy(w, start, cur - start);
 			w[cur - start] = 0;
@@ -189,7 +193,7 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
-	s->bg = 0;
+	s->background = 0;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {
@@ -217,6 +221,13 @@ struct cmdline *readcmd(void)
 				goto error;
 			}
 			s->out = words[i++];
+			break;
+		case '&':
+			if (words[i] != 0) {
+				s->err = "no more command after &";
+				goto error;
+			}
+			s->background = 1;
 			break;
 		case '|':
 			/* Tricky : the word can only be "|" */
@@ -259,7 +270,6 @@ error:
 		case '<':
 		case '>':
 		case '|':
-		case '&':
 			break;
 		default:
 			free(w);
