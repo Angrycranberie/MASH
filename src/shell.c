@@ -142,11 +142,9 @@ int main()
 			}
 		}
 		//wait last process
-		if(nbalive > 0 ){
-			while((waitpid(-1, NULL, WNOHANG|WUNTRACED)){
-				nbalive--;
-			}
-
+		int k;
+		for(k = 0; k< nbalive; k++){
+			waitpid(-1, NULL, WNOHANG);
 		}
 		//closing pipe
 		Close(fd_out[0]);
